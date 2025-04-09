@@ -193,8 +193,6 @@ def comb_sort(values, draw_fn):
             pygame.event.pump()  # Pour que la fenêtre reste responsive
             time.sleep(0.01)
 
-
-
 # Création des boutons de l'interface
 start_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((10, 10), (150, 40)),
                                             text="Démarrer",
@@ -202,17 +200,25 @@ start_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((10, 10), 
 reset_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((10, 60), (150, 40)),
                                              text="Réinitialiser",
                                              manager=manager)
+
+# Création du menu déroulant pour le nombre d'éléments
+elements_menu = pygame_gui.elements.UIDropDownMenu(
+    relative_rect=pygame.Rect((10, 110), (150, 40)),
+    options_list=['100', '200', '1000'],
+    starting_option='100',
+    manager=manager
+)
+
 # Création du menu déroulant avec les nouveaux algorithmes
 sort_menu = pygame_gui.elements.UIDropDownMenu(
-    relative_rect=pygame.Rect((10, 110), (150, 40)),
+    relative_rect=pygame.Rect((10, 160), (150, 40)),
     options_list=['Selection Sort', 'Quick Sort', 'Merge Sort', 'Heap Sort', 'Bubble Sort', 'Insertion Sort', 'Comb Sort'],
     starting_option='Selection Sort',
     manager=manager
 )
 
-
-# Fonction pour réinitialiser la liste des valeurs
-def reset_values():
+# Fonction pour réinitialiser la liste des valeurs avec un nombre d'éléments variable
+def reset_values(num_elements):
     global values
     values = list(range(num_elements))
     random.shuffle(values)
@@ -251,10 +257,21 @@ while running:
                     comb_sort(values, draw_circle)
                 draw_circle(values)  # Redessiner après le tri
 
-
-
             elif event.ui_element == reset_button:
-                reset_values()
+                reset_values(num_elements)
+                draw_circle(values)
+
+        # Changer le nombre d'éléments sélectionné depuis le menu déroulant
+        if event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
+            if event.ui_element == elements_menu:
+                selected_elements = event.text
+                if selected_elements == '100':
+                    num_elements = 100
+                elif selected_elements == '200':
+                    num_elements = 200
+                elif selected_elements == '1000':
+                    num_elements = 1000
+                reset_values(num_elements)
                 draw_circle(values)
 
     manager.update(time_delta)
